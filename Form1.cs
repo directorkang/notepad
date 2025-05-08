@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace notepad
@@ -24,6 +26,7 @@ namespace notepad
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
+            currentFilePath = null;
             UpdateTitle();
         }
 
@@ -36,6 +39,7 @@ namespace notepad
                 richTextBox1.Text = File.ReadAllText(open.FileName);
                 currentFilePath = open.FileName;
                 UpdateTitle();
+                StartAutosave();
             }
         }
 
@@ -118,6 +122,48 @@ namespace notepad
                     return;
                 }
             }
+        }
+
+        private CancellationTokenSource autosaveTokenSource;
+
+        private void StartAutosave()
+        {
+            StopAutosave(); 
+            autosaveTokenSource = new CancellationTokenSource();
+            var token = autosaveTokenSource.Token;
+
+            Task.Run(async () =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    await Task.Delay(10000);
+
+                    if (string.IsNullOrEmpty(currentFilePath))
+                    {
+                        continue;
+                    }
+
+                    string text = "";
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        text = richTextBox1.Text;
+                    }));
+
+                    try
+                    {
+                        File.WriteAllText(currentFilePath, text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Autosave failed: " + ex.Message);
+                    }
+                }
+            }, token);
+        }
+
+        private void StopAutosave()
+        {
+            autosaveTokenSource?.Cancel();
         }
     }
 }
