@@ -52,6 +52,7 @@ namespace notepad
                 File.WriteAllText(save.FileName, richTextBox1.Text);
                 currentFilePath = save.FileName;
                 UpdateTitle();
+                StartAutosave();
             }
         }
 
