@@ -95,6 +95,24 @@ namespace notepad
                         e.Handled = true;
                         return;
                     }
+                case Keys.X:
+                    {
+                        cutToolStripMenuItem_Click(null, null);
+                        e.Handled = true;
+                        return;
+                    }
+                case Keys.C:
+                    {
+                        copyToolStripMenuItem_Click(null, null);
+                        e.Handled = true;
+                        return;
+                    }
+                case Keys.V:
+                    {
+                        pasteToolStripMenuItem_Click(null, null);
+                        e.Handled = true;
+                        return;
+                    }
                 default:
                 {
                     return;
