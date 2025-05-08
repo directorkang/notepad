@@ -35,6 +35,7 @@ namespace notepad
             open.Filter = "Text Files|*.txt|All Files|*.*";
             if (open.ShowDialog() == DialogResult.OK)
             {
+                //should i take note of the file being large and consider using binary or streaming? 
                 richTextBox1.Text = File.ReadAllText(open.FileName);
                 currentFilePath = open.FileName;
                 UpdateTitle();
