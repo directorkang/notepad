@@ -1,21 +1,30 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace notepad
 {
     public partial class Form1 : Form
     {
+        private string currentFilePath = null;
+
         public Form1()
         {
             InitializeComponent();
+            UpdateTitle();
             this.KeyPreview = true;
+        }
+
+        private void UpdateTitle()
+        {
+            string fileName = currentFilePath != null ? Path.GetFileName(currentFilePath) : "Untitled";
+            this.Text = $"{fileName} - Simple Notepad";
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
+            UpdateTitle();
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -25,16 +34,21 @@ namespace notepad
             if (open.ShowDialog() == DialogResult.OK)
             {
                 richTextBox1.Text = File.ReadAllText(open.FileName);
+                currentFilePath = open.FileName;
+                UpdateTitle();
             }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog save = new SaveFileDialog();
+
             save.Filter = "Text Files|*.txt|All Files|*.*";
             if (save.ShowDialog() == DialogResult.OK)
             {
                 File.WriteAllText(save.FileName, richTextBox1.Text);
+                currentFilePath = save.FileName;
+                UpdateTitle();
             }
         }
 
@@ -62,15 +76,29 @@ namespace notepad
         {
             base.OnKeyDown(e);
 
-            if (e.Control && e.KeyCode == Keys.S) 
+            if (!e.Control)
             {
-                saveToolStripMenuItem_Click(null, null);
-                e.Handled = true; 
+                return;
             }
-            else if (e.Control && e.KeyCode == Keys.O) 
+
+            switch (e.KeyCode)
             {
-                openToolStripMenuItem_Click(null, null);
-                e.Handled = true;
+                case Keys.S:
+                    {
+                        saveToolStripMenuItem_Click(null, null);
+                        e.Handled = true;
+                        return;
+                    }
+                case Keys.O:
+                    {
+                        openToolStripMenuItem_Click(null, null);
+                        e.Handled = true;
+                        return;
+                    }
+                default:
+                {
+                    return;
+                }
             }
         }
     }
