@@ -14,7 +14,6 @@ namespace notepad
         {
             InitializeComponent();
             UpdateTitle();
-            this.KeyPreview = true;
         }
 
         private void UpdateTitle()
