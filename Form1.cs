@@ -3,39 +3,19 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
-using System.Net.Sockets;
-using System.Text;
 
 namespace notepad
 {
     public partial class Form1 : Form
     {
         private string currentFilePath = null;
-        private TcpClient tcpClient;
-        private StreamReader m_reader;
-        private StreamWriter m_writer;
 
         public Form1()
         {
             InitializeComponent();
             UpdateTitle();
-            ConnectToServer(); 
         }
 
-        private void ConnectToServer()
-        {
-            try
-            {
-                tcpClient = new TcpClient("localhost", 13000);
-                var stream = tcpClient.GetStream();
-                m_reader = new StreamReader(stream, Encoding.UTF8);
-                m_writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to connect to server: {ex.Message}");
-            }
-        }
         private void UpdateTitle()
         {
             string fileName = currentFilePath != null ? Path.GetFileName(currentFilePath) : "Untitled";
@@ -149,7 +129,6 @@ namespace notepad
 
         private void StartAutosave()
         {
-            //cancel the previous instance 
             StopAutosave(); 
             autosaveTokenSource = new CancellationTokenSource();
             var token = autosaveTokenSource.Token;
